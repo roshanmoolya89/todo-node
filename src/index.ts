@@ -3,7 +3,7 @@ import app from "./app";
 
 dotenv.config();
 
-const port = Number(process.env.PORT) || 3000;
+const port = Number(process.env.APP_PORT) || 3000;
 const host = process.env.HOST ?? "0.0.0.0";
 
 const server = app.listen(port, host, () => {
@@ -18,6 +18,6 @@ const shutdown = (signal: NodeJS.Signals) => {
 
 ["SIGINT", "SIGTERM"].forEach((signal) => {
   process.on(signal as NodeJS.Signals, () =>
-    shutdown(signal as NodeJS.Signals)
+    shutdown(signal as NodeJS.Signals),
   );
 });

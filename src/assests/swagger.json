@@ -1,0 +1,205 @@
+{
+    "openapi": "3.0.2",
+    "info": {
+        "title": "Todo Api",
+        "version": "1.0"
+    },
+    "security": [
+        {
+            "bearer-key": []
+        }
+    ],
+    "tags": [
+        {
+            "name": "Tasks",
+            "description": "Task CRUD APIs"
+        },
+        {
+            "name": "Users",
+            "description": "User CRUD APIs"
+        }
+    ],
+    "paths": {
+        "/tasks": {
+            "summary": "Tasks to track your todos",
+            "get": {
+                "tags": [
+                    "Tasks"
+                ],
+                "parameters": [
+                    {
+                        "name": "isCompleted",
+                        "in": "query",
+                        "description": "Filter tasks by completion status",
+                        "required": false,
+                        "schema": {
+                            "type": "boolean"
+                        }
+                    },
+                    {
+                        "name": "sortBy",
+                        "in": "query",
+                        "description": "Sort tasks by a specific field",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "sortOrder",
+                        "in": "query",
+                        "description": "Order of sorting: asc or desc",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "asc",
+                                "desc"
+                            ]
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "$ref": "#/components/responses/ResponseTaskDTO"
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "Tasks"
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/TaskDTO"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "$ref": "#/components/responses/ResponseTaskDTO"
+                    }
+                }
+            }
+        },
+        "tasks/{id}": {
+            "parameters": [
+                {
+                    "name": "id",
+                    "in": "path",
+                    "required": true,
+                    "schema": {
+                        "type": "integer"
+                    }
+                }
+            ],
+            "get": {
+                "tags": [
+                    "Tasks"
+                ],
+                "responses": {
+                    "200": {
+                        "$ref": "#/components/responses/ResponseTaskDTO"
+                    }
+                }
+            },
+            "put": {
+                "tags": [
+                    "Tasks"
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/TaskUpdateDTO"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "$ref": "#/components/responses/ResponseTaskDTO"
+                    }
+                }
+            }
+        }
+    },
+    "components": {
+        "responses": {
+            "ResponseTaskDTO": {
+                "description": "Task responses",
+                "content": {
+                    "application/json": {
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/components/schemas/BaseResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/components/schemas/TaskDTO"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        },
+        "schemas": {
+            "BaseResponse": {
+                "type": "object",
+                "properties": {
+                    "status": {
+                        "type": "string",
+                        "example": "success"
+                    },
+                    "message": {
+                        "type": "string",
+                        "example": "Operation completed"
+                    }
+                }
+            },
+            "TaskDTO": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "integer"
+                    },
+                    "title": {
+                        "type": "string"
+                    },
+                    "completed": {
+                        "type": "boolean"
+                    }
+                }
+            },
+            "TaskUpdateDTO": {
+                "type": "object",
+                "properties": {
+                    "title": {
+                        "type": "string"
+                    },
+                    "completed": {
+                        "type": "boolean"
+                    }
+                }
+            }
+        },
+        "securitySchemes": {
+            "bearer-key": {
+                "type": "http",
+                "scheme": "bearer",
+                "bearerFormat": "JWT"
+            }
+        }
+    }
+}

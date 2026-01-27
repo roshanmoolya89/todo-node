@@ -1,11 +1,12 @@
 import { NextFunction, Request, Response, Router } from "express";
 import { TodoService } from "../services/todo.service";
+import { NotFoundError } from "../utils/errors";
 
 const tasks = Router();
 const todoService = TodoService.getInstance();
 
 tasks.get("/", async (req: Request, res: Response) => {
-  const data = await todoService.getAllTodos();
+  const data = await todoService.getAllTodos(req.query);
   res.send(data);
 });
 
@@ -15,35 +16,30 @@ tasks.post("/", async (req: Request, res: Response, next: NextFunction) => {
     const todo = await todoService.createTodo(req.body);
     res.send(todo);
   } catch (error: any) {
-    // res.status(500).send({
-    //   message: error.message,
-    //   status: 500,
-    // });
     next(error);
   }
 });
 
 // Get a task by ID
-tasks.get("/:id", async (req: Request, res: Response) => {
+tasks.get("/:id", async (req: Request, res: Response, next: NextFunction) => {
   try {
     const todo = await todoService.getTodoById(req.params.id);
     if (todo) {
       res.send(todo);
     } else {
-      res
-        .status(404)
-        .send({ message: "Task not found with id " + req.params.id });
+      throw new NotFoundError("Task not found with id " + req.params.id);
     }
   } catch (error: any) {
-    res.status(500).send({
-      message: error.message,
-      status: 500,
-    });
+    next(error);
   }
 });
 
-tasks.put("/:id", async (req: Request, res: Response) => {
+tasks.put("/:id", async (req: Request, res: Response, next: NextFunction) => {
   try {
+    const todo = await todoService.getTodoById(req.params.id);
+    if (!todo) {
+      throw new NotFoundError("Task not found with id " + req.params.id);
+    }
     const updateTodo = await todoService.updateTodo(req.params.id, req.body);
     if (updateTodo) {
       res.send(updateTodo);
@@ -52,7 +48,9 @@ tasks.put("/:id", async (req: Request, res: Response) => {
         .status(404)
         .send({ message: "Task not found with id " + req.params.id });
     }
-  } catch (error: any) {}
+  } catch (error: any) {
+    next(error);
+  }
 });
 
 export default tasks;

@@ -6,6 +6,7 @@ import morgan from "morgan";
 import db from "./database/data-source";
 import requestTimeline from "./middleware/requestTimeline";
 import routes from "./routes";
+import { globalErrorHandler, RouteNotFoundError } from "./utils/errors";
 
 global.db = db;
 
@@ -29,14 +30,22 @@ app.get("/", (_req: Request, res: Response) => {
 app.use("/api", routes);
 
 // 404 handler
-app.use((req: Request, res: Response) => {
-  res.status(404).json({ message: `Route ${req.path} not found` });
+app.use((req: Request, res: Response, next: NextFunction) => {
+  const error = new RouteNotFoundError("Route not found", req.path);
+  next(error);
 });
 
 // Global error handler
-app.use((err: Error, _req: Request, res: Response, _next: NextFunction) => {
-  console.error(err);
-  res.status(500).json({ message: err.message || "Internal Server Error" });
+app.use(globalErrorHandler);
+
+process.on("uncaughtException", (err: any) => {
+  console.error("Uncaught Exception:", err.message);
+  process.exit(1); // Exit to prevent an unstable state
+});
+
+process.on("unhandledRejection", (err: any) => {
+  console.error("Unhandled Promise Rejection:", err.message);
+  process.exit(1);
 });
 
 export default app;
