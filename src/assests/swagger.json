@@ -86,14 +86,14 @@
                 }
             }
         },
-        "tasks/{id}": {
+        "/tasks/{id}": {
             "parameters": [
                 {
                     "name": "id",
                     "in": "path",
                     "required": true,
                     "schema": {
-                        "type": "integer"
+                        "type": "string"
                     }
                 }
             ],
@@ -172,7 +172,7 @@
                 "type": "object",
                 "properties": {
                     "id": {
-                        "type": "integer"
+                        "type": "string"
                     },
                     "title": {
                         "type": "string"

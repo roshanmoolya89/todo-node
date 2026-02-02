@@ -1,4 +1,5 @@
 import { Mongoose } from "mongoose";
+import { MONGO_DB, MONGO_URI } from "../constants/env";
 
 export type dataSourceType = {
   client?: Mongoose;
@@ -12,8 +13,8 @@ declare global {
 
 class dataSource {
   public static instance?: dataSource;
-  private connectionString: string = "mongodb://root:example@127.0.0.1:27017";
-  private dbName: string = "todoapp";
+  private connectionString: string = MONGO_URI;
+  private dbName: string = MONGO_DB;
   private params: string = "?authSource=admin&retryWrites=true&w=majority";
   public client?: Mongoose;
   constructor() {
@@ -68,9 +69,8 @@ class dataSource {
     ) {
       throw new Error("MongoDB client is not initialized");
     }
-    const collection = await this.client?.connection.db.createCollection(
-      collectionName
-    );
+    const collection =
+      await this.client?.connection.db.createCollection(collectionName);
     return collection !== null;
   }
 }
